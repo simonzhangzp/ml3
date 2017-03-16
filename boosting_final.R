@@ -16,14 +16,21 @@ summary(customer)
 boost.customer = gbm(Churn ~.-customerID,                   #formula
                      data = customer.train,    
                      #training dataset
-                     distribution = 'bernoulli', #'gaussian' for regression models, 'bernouli' for   classification
+                     distribution = 'multinomial', # "bernoulli" (logistic regression for 0-1 outcomes),"multinomial"(classification when there are more than 2 classes),
+                                                   #'gaussian' for regression models, 'bernouli' for   classification
                      n.trees = 5000,            #number of trees
                      interaction.depth = 4,     #depth of each tree or number of leaves
                      shrinkage = 0.001          #0.001 default value
 )
 
+#### calculate test error rate
+yhat.boost <- predict(boost.customer, newdata = customer[test,], n.trees = 5000,type="response") # Use 5000 trees again for test set
+p.pred<- apply(yhat.boost, 1, which.max)  # assign the column number of which has a bigger probility
+yhat.pred <- ifelse(p.pred=="2", 1, 0)
+x=table(yhat.pred,customer.test)
+as.numeric(x["1",]["1"]+x["0",]["0"])/1000  # error rate
 
-yhat.boost <- predict(boost.customer, newdata = customer[test,], n.trees = 5000) # Use 5000 trees again for test set
+
 gbm.mse <- mean((yhat.boost -customer.test)^2)
 gbm.mse
 
@@ -32,14 +39,20 @@ set.seed(1)
 boost.customer1 = gbm(Churn ~.-customerID,                   #formula
                      data = customer.train,    
                      #training dataset
-                     distribution = 'bernoulli', #'gaussian' for regression models, 'bernouli' for   classification
+                     distribution = 'multinomial', #'gaussian' for regression models, 'bernouli' for   classification
                      n.trees = 5000,            #number of trees increasing slightly decreases mse
                      interaction.depth = 4,     #depth of each tree or number of leaves
                      shrinkage = 0.0001,          #0.001 default value
                      verbose = F
 )
 
-yhat.boost1 <- predict(boost.customer1, newdata = customer[test,], n.trees = 5000) # Use 5000 trees again for test set
+#### calculate test error rate
+yhat.boost1 <- predict(boost.customer1, newdata = customer[test,], n.trees = 5000,type="response") # Use 5000 trees again for test set
+p.pred<- apply(yhat.boost1, 1, which.max)  # assign the column number of which has a bigger probility
+yhat.pred <- ifelse(p.pred=="2", 1, 0)
+x=table(yhat.pred,customer.test)
+as.numeric(x["1",]["1"]+x["0",]["0"])/1000   # error rate
+
 gbm.mse1 <- mean((yhat.boost1 -customer.test)^2)
 gbm.mse1
 
