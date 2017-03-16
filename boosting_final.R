@@ -28,7 +28,8 @@ yhat.boost <- predict(boost.customer, newdata = customer[test,], n.trees = 5000,
 p.pred<- apply(yhat.boost, 1, which.max)  # assign the column number of which has a bigger probility
 yhat.pred <- ifelse(p.pred=="2", 1, 0)
 x=table(yhat.pred,customer.test)
-as.numeric(x["1",]["1"]+x["0",]["0"])/1000  # error rate
+as.numeric(x["1",]["1"]+x["0",]["0"])/1000   # accuracy rate
+1-as.numeric(x["1",]["1"]+x["0",]["0"])/1000 # error rate
 
 
 gbm.mse <- mean((yhat.boost -customer.test)^2)
@@ -51,7 +52,8 @@ yhat.boost1 <- predict(boost.customer1, newdata = customer[test,], n.trees = 500
 p.pred<- apply(yhat.boost1, 1, which.max)  # assign the column number of which has a bigger probility
 yhat.pred <- ifelse(p.pred=="2", 1, 0)
 x=table(yhat.pred,customer.test)
-as.numeric(x["1",]["1"]+x["0",]["0"])/1000   # error rate
+as.numeric(x["1",]["1"]+x["0",]["0"])/1000   # accuracy rate
+1-as.numeric(x["1",]["1"]+x["0",]["0"])/1000 # error rate
 
 gbm.mse1 <- mean((yhat.boost1 -customer.test)^2)
 gbm.mse1
