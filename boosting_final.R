@@ -31,6 +31,27 @@ x=table(yhat.pred,customer.test)
 as.numeric(x["1",]["1"]+x["0",]["0"])/1000   # accuracy rate
 1-as.numeric(x["1",]["1"]+x["0",]["0"])/1000 # error rate
 
+# Tried different combination of interaction.depth, shrinkage rate, predictors, and got the best error rate of 0.192
+# when using TotalCharges+MonthlyCharges+Contract+tenure+InternetService+PaymentMethod as predictors.(Better than use all of the predictors))
+
+boost.customer = gbm(Churn ~TotalCharges+MonthlyCharges+Contract+tenure+InternetService+PaymentMethod-customerID,                   #formula
+                     data = customer.train,    
+                     #training dataset
+                     distribution = 'multinomial', # "bernoulli" (logistic regression for 0-1 outcomes),"multinomial"(classification when there are more than 2 classes),
+                                                   #'gaussian' for regression models, 'bernouli' for   classification
+                     n.trees = 5000,            #number of trees
+                     interaction.depth = 4,     #depth of each tree or number of leaves
+                     shrinkage = 0.001          #0.001 default value
+)
+
+
+#### calculate test error rate
+yhat.boost <- predict(boost.customer, newdata = customer[test,], n.trees = 5000,type="response") # Use 5000 trees again for test set
+p.pred<- apply(yhat.boost, 1, which.max)  # assign the column number of which has a bigger probility
+yhat.pred <- ifelse(p.pred=="2", 1, 0)
+x=table(yhat.pred,customer.test)
+as.numeric(x["1",]["1"]+x["0",]["0"])/1000   # accuracy rate
+1-as.numeric(x["1",]["1"]+x["0",]["0"])/1000 # error rate
 
 gbm.mse <- mean((yhat.boost -customer.test)^2)
 gbm.mse
