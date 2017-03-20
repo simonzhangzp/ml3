@@ -1,7 +1,20 @@
 ##########Classification Tree models #############
-# Please add your conclusion here
-Please add your script here
+# The variables being used are Contract, MonthlyCharges, InternetService, and tenure.
+# The misclassification error rate is .2082
 
+rm(list=ls())
+churndata<-read.table("churndata.csv",header=T,sep=",")
+churndata<-churndata[,-1]
+table(churndata$Churn)
+names(churndata)
+
+#Create the tree
+
+library(tree)
+treemodel<- tree(Churn~., data=churndata)
+summary(treemodel)
+plot(treemodel)
+text(treemodel,pretty=0)
 
 ########## Bagging models #############
 # The lowest error rate we can get from bagging is 0.204 when using ntree=1000 with all of the predictors
