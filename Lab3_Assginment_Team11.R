@@ -36,8 +36,21 @@ as.numeric(x["No",]["No"]+x["Yes",]["Yes"])/1000  # Model Accuracy of Bagging
 1-as.numeric(x["No",]["No"]+x["Yes",]["Yes"])/1000   # Test Error Rate of Bagging
  
 ########## Random Forest models #############
-# Please add your conclusion here
-Please add your script here
+# Error rate of 0.2046396 with 100 trees
+rm(list=ls())
+library(randomForest)
+set.seed(11)
+all_customers = read.csv("data.csv", header=TRUE)
+missing_customers = all_customers[rowSums(is.na(all_customers)) > 0,]
+customers = na.exclude(all_customers)
+train = sample(1:nrow(customers), nrow(customers)*0.8)
+valid = customers[-train,"Churn"]
+
+rf_customers = randomForest(Churn~.-customerID, data=customers, subset=train, mtry=18, importance=TRUE, ntrees=100)
+rf_predict = predict(rf_customers, newdata=customers[-train,])
+rf_error = mean(rf_predict!=valid)
+#importance(rf_customers)
+#varImpPlot(rf_customers)
 
 
 ########## Boosting models #############
